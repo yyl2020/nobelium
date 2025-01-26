@@ -5,7 +5,7 @@ const ParticlesBackground = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const width = window.innerWidth;
     const height = window.innerHeight;
 
@@ -42,7 +42,7 @@ const ParticlesBackground = () => {
 
     // Create particles
     const particles = [];
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 100; i++) {
       particles.push(new Particle());
     }
 
@@ -51,7 +51,26 @@ const ParticlesBackground = () => {
     const animate = () => {
       ctx.clearRect(0, 0, width, height);
 
-      particles.forEach(particle => {
+      // Draw connections between particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 150) {
+            const opacity = 1 - dist / 150;
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.2})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      particles.forEach((particle) => {
         particle.update();
         particle.draw();
       });
@@ -66,7 +85,7 @@ const ParticlesBackground = () => {
       const mouseX = e.clientX;
       const mouseY = e.clientY;
 
-      particles.forEach(particle => {
+      particles.forEach((particle) => {
         const dx = mouseX - particle.x;
         const dy = mouseY - particle.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -81,12 +100,12 @@ const ParticlesBackground = () => {
       });
     };
 
-    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener("mousemove", handleMouseMove);
 
     // Cleanup
     return () => {
       cancelAnimationFrame(animationFrame);
-      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
 
